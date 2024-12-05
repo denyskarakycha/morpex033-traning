@@ -18,6 +18,7 @@ export class UserService {
   addUser(createUserDto: UserDto) {
     createUserDto.id = uuidv4();
     this.users.push(createUserDto);
+    return createUserDto.id;
   }
 
   deleteUserById(id: string) {
