@@ -6,13 +6,20 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { PaginationDto } from './dto/pagination.dto';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get()
+  getAllUsers(@Query() paginationDto: PaginationDto) {
+    return this.userService.getAllUsers(paginationDto);
+  }
 
   @Get('/:id')
   getUser(@Param('id') id: string) {
