@@ -4,8 +4,10 @@ import { IsNumber, IsString, Max, Min } from 'class-validator';
 export class UserDto {
   @Exclude()
   public id: string;
+
   @IsString()
   public name: string;
+
   @IsNumber()
   @Min(0)
   @Max(100)

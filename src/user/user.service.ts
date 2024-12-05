@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
 import { UserDto } from './dto/user.dto';
 
 @Injectable()
@@ -6,19 +7,16 @@ export class UserService {
   private users = [{ id: '1', name: 'Andrey', age: 69 }];
 
   getUserById(id: string) {
-    for (const user of this.users) {
-      if (user.id === id) {
-        return user;
-      } else {
-        return 'User not found';
-      }
-    }
+    const user = this.users.find((user) => user.id === id);
+    if (!user) throw new NotFoundException();
+    return user;
   }
 
   addUser(createUserDto: UserDto) {
     createUserDto.id = uuidv4();
+
     this.users.push(createUserDto);
-    return createUserDto.id;
+    return createUserDto;
   }
 
   deleteUserById(id: string) {
@@ -26,7 +24,7 @@ export class UserService {
     if (index !== -1) {
       this.users.splice(index, 1);
     } else {
-      return 'User not found';
+      throw new NotFoundException();
     }
   }
 
@@ -35,11 +33,7 @@ export class UserService {
     if (index !== -1) {
       this.users[index] = { ...this.users[index], ...updateUserDto };
     } else {
-      return 'User not found';
+      throw new NotFoundException();
     }
   }
-}
-
-function uuidv4(): string {
-  throw new Error('Function not implemented.');
 }
