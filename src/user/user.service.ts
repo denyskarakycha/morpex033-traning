@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { UserDto } from './dto/user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -12,7 +12,7 @@ export class UserService {
     return user;
   }
 
-  addUser(createUserDto: UserDto) {
+  addUser(createUserDto: CreateUserDto) {
     createUserDto.id = uuidv4();
 
     this.users.push(createUserDto);
@@ -28,7 +28,7 @@ export class UserService {
     }
   }
 
-  updateUserById(id: string, updateUserDto: UserDto) {
+  updateUserById(id: string, updateUserDto: CreateUserDto) {
     const index = this.users.findIndex((user) => user.id === id);
     if (index !== -1) {
       this.users[index] = { ...this.users[index], ...updateUserDto };

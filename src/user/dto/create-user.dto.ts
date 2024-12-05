@@ -1,7 +1,7 @@
 import { Exclude } from 'class-transformer';
 import { IsNumber, IsString, Max, Min } from 'class-validator';
 
-export class UserDto {
+export class CreateUserDto {
   @Exclude()
   public id: string;
 
