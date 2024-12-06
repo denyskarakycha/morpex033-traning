@@ -11,6 +11,8 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PaginationDto } from './dto/pagination.dto';
+import { UUID } from 'crypto';
+import { log } from 'console';
 
 @Controller('user')
 export class UserController {
@@ -18,11 +20,13 @@ export class UserController {
 
   @Get()
   getAllUsers(@Query() paginationDto: PaginationDto) {
+    console.log(paginationDto);
+
     return this.userService.getAllUsers(paginationDto);
   }
 
   @Get('/:id')
-  getUser(@Param('id') id: string) {
+  getUser(@Param('id') id: UUID) {
     return this.userService.getUserById(id);
   }
 
@@ -32,12 +36,12 @@ export class UserController {
   }
 
   @Delete('/:id')
-  deleteUser(@Param('id') id: string) {
+  deleteUser(@Param('id') id: UUID) {
     return this.userService.deleteUserById(id);
   }
 
   @Put('/:id')
-  updateUser(@Param('id') id: string, @Body() updateUserDto: CreateUserDto) {
+  updateUser(@Param('id') id: UUID, @Body() updateUserDto: CreateUserDto) {
     return this.userService.updateUserById(id, updateUserDto);
   }
 }

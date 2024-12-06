@@ -1,7 +1,5 @@
-import { Transform } from 'class-transformer';
 import {
   IsEnum,
-  IsIn,
   IsNumber,
   IsOptional,
   IsPositive,
@@ -18,14 +16,13 @@ export class PaginationDto {
   @IsOptional()
   @IsNumber()
   @IsPositive()
-  public pageSize: number = 10;
+  public pageSize: number = 5;
 
   @IsOptional()
   @IsString()
   public sortBy: string = 'id';
 
   @IsOptional()
-  @IsString()
   @IsEnum(SortPaginationEnum)
   public order: SortPaginationEnum = SortPaginationEnum.ACS;
 }
