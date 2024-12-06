@@ -1,31 +1,31 @@
 import { Transform } from 'class-transformer';
 import {
+  IsEnum,
   IsIn,
   IsNumber,
   IsOptional,
   IsPositive,
   IsString,
 } from 'class-validator';
+import { SortPaginationEnum } from 'src/common/enum/sort-pagination.enum';
 
 export class PaginationDto {
   @IsOptional()
   @IsNumber()
   @IsPositive()
-  @Transform(({ value }) => Number(value))
-  public pageNumber: number;
+  public pageNumber: number = 1;
 
   @IsOptional()
   @IsNumber()
   @IsPositive()
-  @Transform(({ value }) => Number(value))
-  public pageSize: number;
+  public pageSize: number = 10;
 
   @IsOptional()
   @IsString()
-  public sortBy: string;
+  public sortBy: string = 'id';
 
   @IsOptional()
   @IsString()
-  @IsIn(['ASC', 'DESC'])
-  public order: 'ASC' | 'DESC';
+  @IsEnum(SortPaginationEnum)
+  public order: SortPaginationEnum = SortPaginationEnum.ACS;
 }

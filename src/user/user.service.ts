@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserRole } from './enum/user-role.enum';
 import { UserDto } from './dto/user.dto';
 import { PaginationDto } from './dto/pagination.dto';
+import { SortPaginationEnum } from 'src/common/enum/sort-pagination.enum';
 
 @Injectable()
 export class UserService {
@@ -31,29 +32,27 @@ export class UserService {
   ];
 
   getAllUsers(paginationDto: PaginationDto) {
-    const pageNumber = paginationDto.pageNumber ?? 1;
-    const pageSize = paginationDto.pageSize ?? 10;
-    const sortBy = paginationDto.sortBy ?? 'id';
-    const order = paginationDto.order ?? 'ASC';
-
     const sortedUsers = [...this.users].sort((a, b) => {
-      const aValue = a[sortBy];
-      const bValue = b[sortBy];
+      const aValue = a[paginationDto.sortBy];
+      const bValue = b[paginationDto.sortBy];
 
-      if (order === 'ASC') {
+      if (paginationDto.order === SortPaginationEnum.ACS) {
         return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
       } else {
         return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
       }
     });
 
-    const startIndex = (pageNumber - 1) * pageSize;
-    const paginatedUsers = sortedUsers.slice(startIndex, startIndex + pageSize);
+    const startIndex = (paginationDto.pageNumber - 1) * paginationDto.pageSize;
+    const paginatedUsers = sortedUsers.slice(
+      startIndex,
+      startIndex + paginationDto.pageSize,
+    );
 
     return {
       total: this.users.length,
-      pageNumber,
-      pageSize,
+      pageNumber: paginationDto.pageNumber,
+      pageSize: paginationDto.pageSize,
       data: paginatedUsers,
     };
   }
