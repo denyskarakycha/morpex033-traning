@@ -2,8 +2,8 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { User } from 'src/database/entity/user.entity';
-import { FindOptionsWhere, Repository } from 'typeorm';
 import { UUID } from 'crypto';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
@@ -13,19 +13,19 @@ export class UserService {
   ) {}
 
   async getAllUsers(paginationDto: PaginationDto) {
-    console.log(paginationDto);
-
     const skip = (paginationDto.pageNumber - 1) * paginationDto.pageSize;
-    const where: FindOptionsWhere<User> = {};
+
+    const order: Record<string, 'ASC' | 'DESC'> = {};
 
     if (paginationDto.sortBy) {
-      where[paginationDto.sortBy] = true;
+      const sortOrder = paginationDto.order === 'DESC' ? 'DESC' : 'ASC';
+      order[paginationDto.sortBy] = sortOrder;
     }
 
     const [users, total] = await this.userRepository.findAndCount({
-      where,
       skip: skip,
       take: paginationDto.pageSize,
+      order,
     });
 
     return {

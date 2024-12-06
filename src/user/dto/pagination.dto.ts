@@ -1,19 +1,21 @@
+import { Type } from 'class-transformer';
 import {
-  IsEnum,
+  IsIn,
   IsNumber,
   IsOptional,
   IsPositive,
   IsString,
 } from 'class-validator';
-import { SortPaginationEnum } from 'src/common/enum/sort-pagination.enum';
 
 export class PaginationDto {
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @IsPositive()
   public pageNumber: number = 1;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @IsPositive()
   public pageSize: number = 5;
@@ -23,6 +25,7 @@ export class PaginationDto {
   public sortBy: string = 'id';
 
   @IsOptional()
-  @IsEnum(SortPaginationEnum)
-  public order: SortPaginationEnum = SortPaginationEnum.ACS;
+  @IsString()
+  @IsIn(['ASC', 'DESC'])
+  public order?: 'ASC' | 'DESC';
 }

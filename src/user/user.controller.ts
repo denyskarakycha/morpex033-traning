@@ -12,7 +12,6 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { UUID } from 'crypto';
-import { log } from 'console';
 
 @Controller('user')
 export class UserController {
@@ -20,8 +19,6 @@ export class UserController {
 
   @Get()
   getAllUsers(@Query() paginationDto: PaginationDto) {
-    console.log(paginationDto);
-
     return this.userService.getAllUsers(paginationDto);
   }
 
