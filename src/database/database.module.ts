@@ -1,8 +1,16 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { databaseProviders } from './database.provider';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { config as dotenvConfig } from 'dotenv';
 
+dotenvConfig({ path: '.env' });
+
+@Global()
 @Module({
-  exports: [...databaseProviders],
-  providers: [...databaseProviders],
+  imports: [
+    TypeOrmModule.forRoot({
+      ...databaseProviders,
+    }),
+  ],
 })
 export class DatabaseModule {}

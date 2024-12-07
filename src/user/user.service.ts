@@ -1,14 +1,15 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { User } from 'src/database/entity/user.entity';
 import { UUID } from 'crypto';
 import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UserService {
   constructor(
-    @Inject('USER_REPOSITORY')
+    @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
 
@@ -18,7 +19,7 @@ export class UserService {
     const order: Record<string, 'ASC' | 'DESC'> = {};
 
     if (paginationDto.sortBy) {
-      const sortOrder = paginationDto.order === 'DESC' ? 'DESC' : 'ASC';
+      const sortOrder = paginationDto?.order || 'DESC';
       order[paginationDto.sortBy] = sortOrder;
     }
 
@@ -36,20 +37,19 @@ export class UserService {
     };
   }
 
-  async getUserById(id: UUID) {
-    let user;
-
+  async getUserById(id: UUID): Promise<User> {
     try {
-      user = await this.userRepository.findOneBy({ id: id });
+      const user = await this.userRepository.findOneBy({ id: id });
+
+      if (!user) throw new NotFoundException('User not found');
+
+      return user;
     } catch (error) {
-      throw new Error(error);
+      throw new InternalServerErrorException(error);
     }
-
-    if (!user) throw new NotFoundException();
-
-    return user;
   }
 
+  // fix this example above
   async addUser(createUserDto: CreateUserDto) {
     let user;
 
@@ -78,8 +78,11 @@ export class UserService {
 
     try {
       user = await this.userRepository.findOneBy({ id: id });
+      // check if user exist or not and throw error
 
-      Object.assign(user, updateUserDto);
+      // use typeorm method .update(userId, updateUserDto)
+
+      Object.assign(user, updateUserDto); // delete this
 
       await this.userRepository.save(user);
     } catch (error) {
