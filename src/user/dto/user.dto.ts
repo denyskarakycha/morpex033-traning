@@ -3,7 +3,7 @@ import { IsEnum, IsNumber, IsString, Max, Min } from 'class-validator';
 import { UserRole } from '../enum/user-role.enum';
 import { UUID } from 'crypto';
 
-export class CreateUserDto {
+export class UserDto {
   @Exclude()
   public id: UUID;
 

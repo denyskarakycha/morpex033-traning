@@ -1,39 +1,88 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
+import { PaginationDto } from './dto/pagination.dto';
+import { User } from 'src/database/entity/user.entity';
+import { UUID } from 'crypto';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UserService {
-  private users = [{ id: '1', name: 'Andrey', age: 69 }];
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {}
 
-  getUserById(id: string) {
-    const user = this.users.find((user) => user.id === id);
-    if (!user) throw new NotFoundException();
-    return user;
+  async getAllUsers(paginationDto: PaginationDto) {
+    const skip = (paginationDto.pageNumber - 1) * paginationDto.pageSize;
+
+    const order: Record<string, 'ASC' | 'DESC'> = {};
+
+    if (paginationDto.sortBy) {
+      const sortOrder = paginationDto?.order || 'DESC';
+      order[paginationDto.sortBy] = sortOrder;
+    }
+
+    const [users, total] = await this.userRepository.findAndCount({
+      skip: skip,
+      take: paginationDto.pageSize,
+      order,
+    });
+
+    return {
+      total: total,
+      page: paginationDto.pageNumber,
+      lastPage: Math.ceil(total / paginationDto.pageSize),
+      data: users,
+    };
   }
 
-  addUser(createUserDto: CreateUserDto) {
-    createUserDto.id = uuidv4();
+  async getUserById(id: UUID): Promise<User> {
+    try {
+      const user = await this.userRepository.findOneBy({ id: id });
 
-    this.users.push(createUserDto);
-    return createUserDto;
-  }
+      if (!user) throw new NotFoundException('User not found');
 
-  deleteUserById(id: string) {
-    const index = this.users.findIndex((user) => user.id === id);
-    if (index !== -1) {
-      this.users.splice(index, 1);
-    } else {
-      throw new NotFoundException();
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
     }
   }
 
-  updateUserById(id: string, updateUserDto: CreateUserDto) {
-    const index = this.users.findIndex((user) => user.id === id);
-    if (index !== -1) {
-      this.users[index] = { ...this.users[index], ...updateUserDto };
-    } else {
-      throw new NotFoundException();
+  // fix this example above
+  async addUser(createUserDto: CreateUserDto): Promise<User> {
+    try {
+      const user = await this.userRepository.save(createUserDto);
+
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  async deleteUserById(id: UUID) {
+    try {
+      const user = await this.userRepository.findOneBy({ id: id });
+      await this.userRepository.delete(user);
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  async updateUserById(id: UUID, updateUserDto: CreateUserDto) {
+    try {
+      const user = await this.userRepository.findOneBy({ id: id });
+
+      if (!user) throw new NotFoundException('User not found');
+
+      await this.userRepository.update(user.id, updateUserDto);
+    } catch (error) {
+      throw new InternalServerErrorException(error);
     }
   }
 }
