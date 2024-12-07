@@ -1,4 +1,9 @@
-import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { User } from 'src/database/entity/user.entity';
@@ -50,43 +55,34 @@ export class UserService {
   }
 
   // fix this example above
-  async addUser(createUserDto: CreateUserDto) {
-    let user;
-
+  async addUser(createUserDto: CreateUserDto): Promise<User> {
     try {
-      user = await this.userRepository.save(createUserDto);
-    } catch (error) {
-      throw new Error(error);
-    }
+      const user = await this.userRepository.save(createUserDto);
 
-    return user;
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 
   async deleteUserById(id: UUID) {
-    let user;
-
     try {
-      user = await this.userRepository.findOneBy({ id: id });
+      const user = await this.userRepository.findOneBy({ id: id });
       await this.userRepository.delete(user);
     } catch (error) {
-      throw new Error(error);
+      throw new InternalServerErrorException(error);
     }
   }
 
   async updateUserById(id: UUID, updateUserDto: CreateUserDto) {
-    let user;
-
     try {
-      user = await this.userRepository.findOneBy({ id: id });
-      // check if user exist or not and throw error
+      const user = await this.userRepository.findOneBy({ id: id });
 
-      // use typeorm method .update(userId, updateUserDto)
+      if (!user) throw new NotFoundException('User not found');
 
-      Object.assign(user, updateUserDto); // delete this
-
-      await this.userRepository.save(user);
+      await this.userRepository.update(user.id, updateUserDto);
     } catch (error) {
-      throw new Error(error);
+      throw new InternalServerErrorException(error);
     }
   }
 }

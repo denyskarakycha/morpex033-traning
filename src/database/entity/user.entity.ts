@@ -17,9 +17,8 @@ export class User {
   @Column('int')
   age: number;
 
-  // @Column({
-  //   enum: UserRole,
-  // })
-  @Column()
+  @Column({
+    enum: UserRole,
+  })
   role: UserRole;
 }
