@@ -14,6 +14,12 @@ export class User {
   })
   name: string;
 
+  @Column({
+    name: 'password',
+    type: 'varchar',
+  })
+  public password: string;
+
   @Column('int')
   age: number;
 

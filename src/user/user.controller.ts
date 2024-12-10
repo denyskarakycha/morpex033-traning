@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './dto/sing-up-user.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { UUID } from 'crypto';
 

@@ -1,10 +1,9 @@
 import {
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { SingUpUserDto } from './dto/sing-up-user.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { User } from 'src/database/entity/user.entity';
 import { UUID } from 'crypto';
@@ -54,8 +53,7 @@ export class UserService {
     }
   }
 
-  // fix this example above
-  async addUser(createUserDto: CreateUserDto): Promise<User> {
+  async addUser(createUserDto: SingUpUserDto): Promise<User> {
     try {
       const user = await this.userRepository.save(createUserDto);
 
@@ -74,7 +72,7 @@ export class UserService {
     }
   }
 
-  async updateUserById(id: UUID, updateUserDto: CreateUserDto) {
+  async updateUserById(id: UUID, updateUserDto: SingUpUserDto) {
     try {
       const user = await this.userRepository.findOneBy({ id: id });
 

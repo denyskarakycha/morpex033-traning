@@ -3,12 +3,17 @@ import { IsEnum, IsNumber, IsString, Max, Min } from 'class-validator';
 import { UserRole } from '../enum/user-role.enum';
 import { UUID } from 'crypto';
 
-export class CreateUserDto {
+export class SingUpUserDto {
   @Exclude()
   public id: UUID;
 
   @IsString()
   public name: string;
+
+  @IsString()
+  @Min(5)
+  @Max(16)
+  public password: string;
 
   @IsNumber()
   @Min(0)
