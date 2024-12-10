@@ -53,6 +53,20 @@ export class UserService {
     }
   }
 
+  async getUserByName(name: string): Promise<User[]> {
+    try {
+      const users: User[] = await this.userRepository.findBy({
+        name: name,
+      });
+
+      if (!users) throw new NotFoundException('User not found');
+
+      return users;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
   async addUser(createUserDto: SingUpUserDto): Promise<User> {
     try {
       const user = await this.userRepository.save(createUserDto);
