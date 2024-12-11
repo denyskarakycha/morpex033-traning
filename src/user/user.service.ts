@@ -1,10 +1,10 @@
 import {
-  Inject,
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { SingUpUserDto } from './dto/sing-up-user.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { User } from 'src/database/entity/user.entity';
 import { UUID } from 'crypto';
@@ -54,10 +54,27 @@ export class UserService {
     }
   }
 
-  // fix this example above
-  async addUser(createUserDto: CreateUserDto): Promise<User> {
+  async getUserByEmail(email: string): Promise<User> {
     try {
-      const user = await this.userRepository.save(createUserDto);
+      const user = await this.userRepository.findOneBy({
+        email: email,
+      });
+
+      if (!user) throw new NotFoundException('User not found');
+
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  async addUser(createUserDto: SingUpUserDto): Promise<User> {
+    try {
+      if (!this.userRepository.findOneBy({ email: createUserDto.email })) {
+        throw new ConflictException();
+      }
+
+      const user: User = await this.userRepository.save(createUserDto);
 
       return user;
     } catch (error) {
@@ -74,7 +91,7 @@ export class UserService {
     }
   }
 
-  async updateUserById(id: UUID, updateUserDto: CreateUserDto) {
+  async updateUserById(id: UUID, updateUserDto: SingUpUserDto) {
     try {
       const user = await this.userRepository.findOneBy({ id: id });
 
