@@ -10,7 +10,6 @@ import { User } from 'src/database/entity/user.entity';
 import { UUID } from 'crypto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
