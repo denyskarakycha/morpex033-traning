@@ -7,11 +7,15 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { config as dotenvConfig } from 'dotenv';
+import { UserService } from 'src/user/user.service';
 dotenvConfig({ path: '.env' });
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private userService: UserService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -25,6 +29,11 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET,
       });
+
+      const user = await this.userService.getUserById(payload.sub);
+      if (!user) {
+        throw new UnauthorizedException('User no longer exists');
+      }
 
       request['user'] = payload;
     } catch {

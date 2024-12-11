@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  Post,
   Put,
   Query,
   UseGuards,
@@ -30,13 +29,6 @@ export class UserController {
   getUser(@Param('id') id: UUID) {
     return this.userService.getUserById(id);
   }
-
-  /*
-  @Post()
-  addUser(@Body() createUserDto: SingUpUserDto) {
-    return this.userService.addUser(createUserDto);
-  }
-  */
 
   @UseGuards(AuthGuard)
   @Delete('/:id')

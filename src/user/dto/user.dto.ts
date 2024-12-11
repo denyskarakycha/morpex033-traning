@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { IsEnum, IsNumber, IsString, Max, Min } from 'class-validator';
+import { IsEmail, IsEnum, IsNumber, IsString, Max, Min } from 'class-validator';
 import { UserRole } from '../enum/user-role.enum';
 import { UUID } from 'crypto';
 
@@ -9,6 +9,10 @@ export class UserDto {
 
   @IsString()
   public name: string;
+
+  @IsString()
+  @IsEmail()
+  public email: string;
 
   @IsNumber()
   @Min(0)

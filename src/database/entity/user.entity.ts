@@ -15,6 +15,12 @@ export class User {
   name: string;
 
   @Column({
+    name: 'email',
+    type: 'varchar',
+  })
+  email: string;
+
+  @Column({
     name: 'password',
     type: 'varchar',
   })

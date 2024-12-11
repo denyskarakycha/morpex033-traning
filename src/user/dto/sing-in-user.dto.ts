@@ -1,8 +1,9 @@
-import { IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class SingInUserDto {
   @IsString()
-  public name: string;
+  @IsEmail()
+  public email: string;
 
   @IsString()
   @MinLength(5)

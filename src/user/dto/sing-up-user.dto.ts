@@ -1,5 +1,6 @@
-import { Exclude } from 'class-transformer';
+import { classToPlain, Exclude } from 'class-transformer';
 import {
+  IsEmail,
   IsEnum,
   IsNumber,
   IsString,
@@ -17,6 +18,10 @@ export class SingUpUserDto {
 
   @IsString()
   public name: string;
+
+  @IsString()
+  @IsEmail()
+  public email: string;
 
   @IsString()
   @MinLength(5)

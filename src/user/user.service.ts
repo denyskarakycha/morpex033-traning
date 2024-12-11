@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -9,6 +10,7 @@ import { User } from 'src/database/entity/user.entity';
 import { UUID } from 'crypto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
@@ -53,15 +55,15 @@ export class UserService {
     }
   }
 
-  async getUserByName(name: string): Promise<User[]> {
+  async getUserByEmail(email: string): Promise<User> {
     try {
-      const users: User[] = await this.userRepository.findBy({
-        name: name,
+      const user = await this.userRepository.findOneBy({
+        email: email,
       });
 
-      if (!users) throw new NotFoundException('User not found');
+      if (!user) throw new NotFoundException('User not found');
 
-      return users;
+      return user;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
@@ -69,7 +71,11 @@ export class UserService {
 
   async addUser(createUserDto: SingUpUserDto): Promise<User> {
     try {
-      const user = await this.userRepository.save(createUserDto);
+      if (!this.userRepository.findOneBy({ email: createUserDto.email })) {
+        throw new ConflictException();
+      }
+
+      const user: User = await this.userRepository.save(createUserDto);
 
       return user;
     } catch (error) {

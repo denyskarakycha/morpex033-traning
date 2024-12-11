@@ -31,30 +31,26 @@ export class AuthService {
 
   async singIn(singInUserDto: SingInUserDto) {
     try {
-      const users: User[] = await this.userService.getUserByName(
-        singInUserDto.name,
-      );
+      const user = await this.userService.getUserByEmail(singInUserDto.email);
 
-      if (!users) throw new UnauthorizedException('Wrong name or password');
+      if (!user) throw new UnauthorizedException('Wrong name or password');
 
-      for (const user of users) {
-        if (
-          user.name === singInUserDto.name &&
-          (await bcrypt.compare(singInUserDto.password, user.password))
-        ) {
-          const payload = {
-            sub: user.id,
-            name: user.name,
-            role: user.role,
-            iat: Date.now(),
-          };
+      if (
+        user.email === singInUserDto.email &&
+        (await bcrypt.compare(singInUserDto.password, user.password))
+      ) {
+        const payload = {
+          sub: user.id,
+          email: user.email,
+          role: user.role,
+          iat: Date.now(),
+        };
 
-          const accessToken = await this.jwtService.signAsync(payload);
+        const accessToken = await this.jwtService.signAsync(payload);
 
-          return {
-            access_token: accessToken,
-          };
-        }
+        return {
+          access_token: accessToken,
+        };
       }
     } catch (error) {
       throw new InternalServerErrorException(error);
