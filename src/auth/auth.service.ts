@@ -10,6 +10,8 @@ import { SingInUserDto } from 'src/user/dto/sing-in-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { config as dotenvConfig } from 'dotenv';
+import { log } from 'console';
+import { JwtPayloadDto } from './dto/jwt-payload.dto';
 dotenvConfig({ path: '.env' });
 
 @Injectable()
@@ -38,7 +40,9 @@ export class AuthService {
       if (await bcrypt.compare(singInUserDto.password, user.password)) {
         const payload = { id: user.id, email: user.email, role: user.role };
 
-        const accessToken = await this.jwtService.signAsync(payload);
+        const accessToken = await this.jwtService.signAsync(payload, {
+          expiresIn: process.env.ACCESS_EXPIRES_IN,
+        });
 
         const refreshToken = await this.jwtService.signAsync(payload, {
           secret: process.env.JWT_REFRESH_SECRET,
@@ -57,20 +61,22 @@ export class AuthService {
     }
   }
 
-  async decodeAccessToken(token: string) {
-    const payload = await this.jwtService.verifyAsync(token, {
-      secret: process.env.JWT_SECRET,
-    });
-
-    const user = await this.userService.getUserById(payload.sub);
-    if (!user) {
-      throw new UnauthorizedException('User no longer exists');
-    }
-  }
-
   async refreshAccessToken(refreshToken: string) {
-    const payload = this.jwtService.decode(refreshToken);
+    const { id, email, role } = await this.jwtService.verifyAsync(
+      refreshToken,
+      {
+        secret: process.env.JWT_REFRESH_SECRET,
+      },
+    );
 
-    return this.jwtService.signAsync(payload);
+    const accessToken = await this.jwtService.signAsync(
+      { id, email, role },
+      {
+        secret: process.env.JWT_ACCESS_SECRET,
+        expiresIn: process.env.REFRESH_EXPIRES_IN,
+      },
+    );
+
+    return { accessToken };
   }
 }

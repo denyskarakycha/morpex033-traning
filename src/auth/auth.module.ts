@@ -13,11 +13,10 @@ dotenvConfig({ path: '.env' });
     JwtModule.register({
       global: true,
       secret: process.env.JWT_ACCESS_SECRET,
-      signOptions: { expiresIn: process.env.EXPIRES_IN },
     }),
   ],
   controllers: [AuthController],
   providers: [AuthService, AuthGuard],
-  exports: [AuthGuard],
+  exports: [AuthService, AuthGuard],
 })
 export class AuthModule {}

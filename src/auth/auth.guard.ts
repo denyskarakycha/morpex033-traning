@@ -6,12 +6,16 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { config as dotenvConfig } from 'dotenv';
-import { AuthService } from './auth.service';
+import { UserService } from 'src/user/user.service';
+import { JwtService } from '@nestjs/jwt';
 dotenvConfig({ path: '.env' });
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -22,8 +26,17 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      request['user'] = await this.authService.decodeAccessToken(token);
-    } catch {
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_ACCESS_SECRET,
+      });
+
+      const user = await this.userService.getUserById(payload.sub);
+      if (!user) {
+        throw new UnauthorizedException('User no longer exists');
+      }
+
+      request['user'] = user;
+    } catch (error) {
       throw new UnauthorizedException();
     }
     return true;
