@@ -9,6 +9,8 @@ import { User } from 'src/database/entity/user.entity';
 import { SingInUserDto } from 'src/user/dto/sing-in-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
+import { config as dotenvConfig } from 'dotenv';
+dotenvConfig({ path: '.env' });
 
 @Injectable()
 export class AuthService {
@@ -21,9 +23,7 @@ export class AuthService {
     try {
       const hash = await bcrypt.hash(singUpUserDto.password, 8);
 
-      singUpUserDto.password = hash;
-
-      return this.userService.addUser(singUpUserDto);
+      return this.userService.addUser({ ...singUpUserDto, password: hash });
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
@@ -33,27 +33,44 @@ export class AuthService {
     try {
       const user = await this.userService.getUserByEmail(singInUserDto.email);
 
-      if (!user) throw new UnauthorizedException('Wrong name or password');
+      if (!user) throw new UnauthorizedException('Wrong email or password');
 
-      if (
-        user.email === singInUserDto.email &&
-        (await bcrypt.compare(singInUserDto.password, user.password))
-      ) {
-        const payload = {
-          sub: user.id,
-          email: user.email,
-          role: user.role,
-          iat: Date.now(),
-        };
+      if (await bcrypt.compare(singInUserDto.password, user.password)) {
+        const payload = { id: user.id, email: user.email, role: user.role };
 
         const accessToken = await this.jwtService.signAsync(payload);
 
+        const refreshToken = await this.jwtService.signAsync(payload, {
+          secret: process.env.JWT_REFRESH_SECRET,
+          expiresIn: process.env.REFRESH_EXPIRES_IN,
+        });
+
         return {
-          access_token: accessToken,
+          accessToken,
+          refreshToken,
         };
+      } else {
+        throw new UnauthorizedException('Wrong email or password');
       }
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
+  }
+
+  async decodeAccessToken(token: string) {
+    const payload = await this.jwtService.verifyAsync(token, {
+      secret: process.env.JWT_SECRET,
+    });
+
+    const user = await this.userService.getUserById(payload.sub);
+    if (!user) {
+      throw new UnauthorizedException('User no longer exists');
+    }
+  }
+
+  async refreshAccessToken(refreshToken: string) {
+    const payload = this.jwtService.decode(refreshToken);
+
+    return this.jwtService.signAsync(payload);
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SingUpUserDto } from 'src/user/dto/sing-up-user.dto';
 import { SingInUserDto } from 'src/user/dto/sing-in-user.dto';
@@ -12,9 +12,13 @@ export class AuthController {
     return this.authService.singUp(singUpUserDto);
   }
 
-  @HttpCode(HttpStatus.OK)
   @Post('/sing-in')
   singIn(@Body() singInUserDto: SingInUserDto) {
     return this.authService.singIn(singInUserDto);
+  }
+
+  @Post('refresh')
+  refreshAccessToken(@Body() refreshToken: string) {
+    return this.authService.refreshAccessToken(refreshToken);
   }
 }

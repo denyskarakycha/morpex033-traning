@@ -70,13 +70,14 @@ export class UserService {
 
   async addUser(createUserDto: SingUpUserDto): Promise<User> {
     try {
-      if (!this.userRepository.findOneBy({ email: createUserDto.email })) {
+      const user = this.getUserByEmail(createUserDto.email);
+      if (user) {
         throw new ConflictException();
       }
 
-      const user: User = await this.userRepository.save(createUserDto);
+      const createdUser: User = await this.userRepository.save(createUserDto);
 
-      return user;
+      return createdUser;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
