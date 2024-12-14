@@ -10,8 +10,6 @@ import { SingInUserDto } from 'src/user/dto/sing-in-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { config as dotenvConfig } from 'dotenv';
-import { log } from 'console';
-import { JwtPayloadDto } from './dto/jwt-payload.dto';
 dotenvConfig({ path: '.env' });
 
 @Injectable()

@@ -5,6 +5,7 @@ import { UserModule } from 'src/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { config as dotenvConfig } from 'dotenv';
 import { AuthGuard } from './auth.guard';
+import { RolesGuard } from './roles.guard';
 dotenvConfig({ path: '.env' });
 
 @Module({
@@ -16,7 +17,7 @@ dotenvConfig({ path: '.env' });
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthGuard],
-  exports: [AuthService, AuthGuard],
+  providers: [AuthService, AuthGuard, RolesGuard],
+  exports: [AuthService, AuthGuard, RolesGuard],
 })
 export class AuthModule {}
