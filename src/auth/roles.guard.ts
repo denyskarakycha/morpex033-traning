@@ -7,6 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { Roles } from './roles.decorator';
+import { UserRole } from 'src/user/enum/user-role.enum';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -24,15 +25,15 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    return matchRoles(roles, user.role);
+    return this.matchRoles(roles, user.role);
   }
-}
 
-function matchRoles(
-  roles: string[],
-  userRole: string,
-): boolean | Promise<boolean> | Observable<boolean> {
-  if (roles.some((role) => role === userRole)) return true;
+  private matchRoles(
+    roles: UserRole[],
+    userRole: UserRole,
+  ): boolean | Promise<boolean> | Observable<boolean> {
+    if (roles.some((role) => role === userRole)) return true;
 
-  throw new ForbiddenException('Access denied');
+    throw new ForbiddenException('Access denied');
+  }
 }

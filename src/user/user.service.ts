@@ -70,10 +70,13 @@ export class UserService {
 
   async addUser(createUserDto: SingUpUserDto): Promise<User> {
     try {
-      const user = this.getUserByEmail(createUserDto.email);
+      const user = await this.userRepository.findOneBy({
+        email: createUserDto.email,
+      });
       if (user) {
         throw new ConflictException();
       }
+      console.log(createUserDto);
 
       const createdUser: User = await this.userRepository.save(createUserDto);
 

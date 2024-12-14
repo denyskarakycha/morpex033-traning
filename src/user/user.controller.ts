@@ -15,13 +15,14 @@ import { UUID } from 'crypto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
+import { UserRole } from './enum/user-role.enum';
 
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Roles(['Teacher'])
+  @Roles([UserRole.Teacher])
   @Get()
   getAllUsers(@Query() paginationDto: PaginationDto) {
     return this.userService.getAllUsers(paginationDto);
@@ -32,7 +33,7 @@ export class UserController {
     return this.userService.getUserById(id);
   }
 
-  @Roles(['Teacher'])
+  @Roles([UserRole.Teacher])
   @Delete('/:id')
   deleteUser(@Param('id') id: UUID) {
     return this.userService.deleteUserById(id);

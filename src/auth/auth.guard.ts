@@ -30,7 +30,8 @@ export class AuthGuard implements CanActivate {
         secret: process.env.JWT_ACCESS_SECRET,
       });
 
-      const user = await this.userService.getUserById(payload.sub);
+      const user = await this.userService.getUserById(payload.id);
+
       if (!user) {
         throw new UnauthorizedException('User no longer exists');
       }
