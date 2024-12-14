@@ -39,6 +39,7 @@ export class UserController {
     return this.userService.deleteUserById(id);
   }
 
+  @Roles([UserRole.Teacher])
   @Put('/:id')
   updateUser(@Param('id') id: UUID, @Body() updateUserDto: SingUpUserDto) {
     return this.userService.updateUserById(id, updateUserDto);
