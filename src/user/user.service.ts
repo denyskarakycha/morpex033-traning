@@ -10,6 +10,7 @@ import { User } from 'src/database/entity/user.entity';
 import { UUID } from 'crypto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -76,7 +77,6 @@ export class UserService {
       if (user) {
         throw new ConflictException();
       }
-      console.log(createUserDto);
 
       const createdUser: User = await this.userRepository.save(createUserDto);
 
@@ -88,14 +88,19 @@ export class UserService {
 
   async deleteUserById(id: UUID) {
     try {
-      const user = await this.userRepository.findOneBy({ id: id });
+      const user = await this.userRepository.findOneBy({ id });
+
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
       await this.userRepository.delete(user);
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
 
-  async updateUserById(id: UUID, updateUserDto: SingUpUserDto) {
+  async updateUserById(id: UUID, updateUserDto: UpdateUserDto) {
     try {
       const user = await this.userRepository.findOneBy({ id: id });
 
