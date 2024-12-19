@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { SingUpUserDto } from './dto/sing-up-user.dto';
-import { PaginationDto } from './dto/pagination.dto';
+import { PaginationDto } from '../common/pagination.dto';
 import { User } from 'src/database/entity/user.entity';
 import { UUID } from 'crypto';
 import { Repository } from 'typeorm';
@@ -19,7 +19,7 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  async getAllUsers(paginationDto: PaginationDto) {
+  async getAllUsers(paginationDto?: PaginationDto) {
     const skip = (paginationDto.pageNumber - 1) * paginationDto.pageSize;
 
     const order: Record<string, 'ASC' | 'DESC'> = {};
@@ -94,7 +94,7 @@ export class UserService {
         throw new NotFoundException('User not found');
       }
 
-      await this.userRepository.delete(user);
+      await this.userRepository.delete(user.id);
     } catch (error) {
       throw new InternalServerErrorException(error);
     }

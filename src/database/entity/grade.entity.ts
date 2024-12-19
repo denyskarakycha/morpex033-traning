@@ -6,7 +6,7 @@ import { Max, Min } from 'class-validator';
 @Entity('grade')
 export class Grade {
   @PrimaryGeneratedColumn('uuid')
-  public id: number;
+  public id: string;
 
   @ManyToOne(() => User, (user) => user.id)
   public student: User;

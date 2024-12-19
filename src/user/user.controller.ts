@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { PaginationDto } from './dto/pagination.dto';
+import { PaginationDto } from '../common/pagination.dto';
 import { UUID } from 'crypto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
