@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { SingUpUserDto } from './dto/sing-up-user.dto';
@@ -14,33 +15,39 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
 
   async getAllUsers(paginationDto?: PaginationDto) {
-    const skip = (paginationDto.pageNumber - 1) * paginationDto.pageSize;
+    try {
+      const skip = (paginationDto.pageNumber - 1) * paginationDto.pageSize;
 
-    const order: Record<string, 'ASC' | 'DESC'> = {};
+      const order: Record<string, 'ASC' | 'DESC'> = {};
 
-    if (paginationDto.sortBy) {
-      const sortOrder = paginationDto?.order || 'DESC';
-      order[paginationDto.sortBy] = sortOrder;
+      if (paginationDto.sortBy) {
+        const sortOrder = paginationDto?.order || 'DESC';
+        order[paginationDto.sortBy] = sortOrder;
+      }
+
+      const [users, total] = await this.userRepository.findAndCount({
+        skip: skip,
+        take: paginationDto.pageSize,
+        order,
+      });
+
+      return {
+        total: total,
+        page: paginationDto.pageNumber,
+        lastPage: Math.ceil(total / paginationDto.pageSize),
+        data: users,
+      };
+    } catch (error) {
+      this.logger.log(error);
+      throw new InternalServerErrorException(error);
     }
-
-    const [users, total] = await this.userRepository.findAndCount({
-      skip: skip,
-      take: paginationDto.pageSize,
-      order,
-    });
-
-    return {
-      total: total,
-      page: paginationDto.pageNumber,
-      lastPage: Math.ceil(total / paginationDto.pageSize),
-      data: users,
-    };
   }
 
   async getUserById(id: UUID): Promise<User> {
@@ -51,6 +58,7 @@ export class UserService {
 
       return user;
     } catch (error) {
+      this.logger.log(error);
       throw new InternalServerErrorException(error);
     }
   }
@@ -65,6 +73,7 @@ export class UserService {
 
       return user;
     } catch (error) {
+      this.logger.log(error);
       throw new InternalServerErrorException(error);
     }
   }
@@ -82,6 +91,7 @@ export class UserService {
 
       return createdUser;
     } catch (error) {
+      this.logger.log(error);
       throw new InternalServerErrorException(error);
     }
   }
@@ -96,6 +106,7 @@ export class UserService {
 
       await this.userRepository.delete(user.id);
     } catch (error) {
+      this.logger.log(error);
       throw new InternalServerErrorException(error);
     }
   }
@@ -108,6 +119,7 @@ export class UserService {
 
       await this.userRepository.update(user.id, updateUserDto);
     } catch (error) {
+      this.logger.log(error);
       throw new InternalServerErrorException(error);
     }
   }
