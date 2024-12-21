@@ -1,6 +1,14 @@
 import { UUID } from 'crypto';
 import { UserRole } from 'src/user/enum/user-role.enum';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Subject } from './subject.entity';
 
 @Entity('user')
 export class User {
@@ -27,10 +35,17 @@ export class User {
   public password: string;
 
   @Column('int')
-  age: number;
+  public age: number;
 
   @Column({
     enum: UserRole,
   })
-  role: UserRole;
+  public role: UserRole;
+
+  @OneToMany(() => Subject, (subject) => subject.teacher)
+  public taughtSubjects: Subject[];
+
+  @ManyToMany(() => Subject, (subject) => subject.students)
+  @JoinTable()
+  public subjects: Subject[];
 }

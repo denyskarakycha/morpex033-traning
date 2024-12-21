@@ -1,17 +1,12 @@
 import { Exclude } from 'class-transformer';
-import {
-  IsEmail,
-  IsEnum,
-  IsNumber,
-  IsString,
-  Max,
-  MaxLength,
-  Min,
-  MinLength,
-} from 'class-validator';
-import { UserRole } from '../enum/user-role.enum';
+import { IsEmail, IsEnum, IsNumber, IsString, Max, Min } from 'class-validator';
+import { UUID } from 'crypto';
+import { UserRole } from 'src/user/enum/user-role.enum';
 
-export class SingUpUserDto {
+export class StudentDto {
+  @Exclude()
+  public id: UUID;
+
   @IsString()
   public name: string;
 
@@ -20,8 +15,6 @@ export class SingUpUserDto {
   public email: string;
 
   @IsString()
-  @MinLength(5)
-  @MaxLength(16)
   public password: string;
 
   @IsNumber()
