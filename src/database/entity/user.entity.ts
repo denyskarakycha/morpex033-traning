@@ -35,17 +35,17 @@ export class User {
   public password: string;
 
   @Column('int')
-  age: number;
+  public age: number;
 
   @Column({
     enum: UserRole,
   })
-  role: UserRole;
+  public role: UserRole;
 
   @OneToMany(() => Subject, (subject) => subject.teacher)
-  taughtSubjects: Subject[];
+  public taughtSubjects: Subject[];
 
   @ManyToMany(() => Subject, (subject) => subject.students)
   @JoinTable()
-  subjects: Subject[];
+  public subjects: Subject[];
 }

@@ -10,12 +10,8 @@ import {
   MinLength,
 } from 'class-validator';
 import { UserRole } from '../enum/user-role.enum';
-import { UUID } from 'crypto';
 
 export class SingUpUserDto {
-  @Exclude()
-  public id: UUID;
-
   @IsString()
   public name: string;
 

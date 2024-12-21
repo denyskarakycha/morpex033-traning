@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { UniversityService } from './university.service';
-import { UniversityController } from './university.controller';
+import { SubjectService } from './subject.service';
+import { SubjectController } from './subject.controller';
 import { UserModule } from 'src/user/user.module';
 import { DatabaseModule } from 'src/database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,7 +13,7 @@ import { Grade } from 'src/database/entity/grade.entity';
     DatabaseModule,
     TypeOrmModule.forFeature([Subject, Grade]),
   ],
-  controllers: [UniversityController],
-  providers: [UniversityService],
+  controllers: [SubjectController],
+  providers: [SubjectService],
 })
-export class UniversityModule {}
+export class SubjectModule {}

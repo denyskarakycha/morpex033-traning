@@ -13,16 +13,18 @@ import { Repository } from 'typeorm';
 import { SubjectDto } from './dto/subject.dto';
 import { UserRole } from 'src/user/enum/user-role.enum';
 import { randomUUID, UUID } from 'crypto';
-import { UpdateSubjectDto } from './dto/update-subject.dto';
 import { User } from 'src/database/entity/user.entity';
 import { StudentDto } from './dto/student.dto';
 import { GradeDto } from './dto/grade.dto';
-import { PaginationDto } from 'src/common/pagination.dto';
-import { UpdateGradeDto } from './dto/update-grade.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { CreateGradeDto } from './dto/create-grade.dto';
+import { CreateSubjectDto } from './dto/create-subject.dto';
+import { PaginationDataResponseDto } from 'src/common/dto/pagination-data-response.dto';
+import { UserDto } from 'src/user/dto/user.dto';
 
 @Injectable()
-export class UniversityService {
-  private readonly logger = new Logger(UniversityService.name);
+export class SubjectService {
+  private readonly logger = new Logger(SubjectService.name);
 
   constructor(
     private readonly userService: UserService,
@@ -32,7 +34,7 @@ export class UniversityService {
     private gradeRepository: Repository<Grade>,
   ) {}
 
-  async createSubject(subjectDto: SubjectDto) {
+  async createSubject(subjectDto: CreateSubjectDto) {
     try {
       const subject = await this.subjectRepository.findOneBy({
         name: subjectDto.name,
@@ -49,7 +51,7 @@ export class UniversityService {
       const createdSubject: Subject =
         await this.subjectRepository.save(subjectDto);
 
-      return createdSubject;
+      return new SubjectDto(createdSubject);
     } catch (error) {
       this.logger.log(error);
       throw new InternalServerErrorException(error);
@@ -63,7 +65,7 @@ export class UniversityService {
         relations: { teacher: true, students: true },
       });
 
-      return subject;
+      return new SubjectDto(subject);
     } catch (error) {
       this.logger.log(error);
       throw new InternalServerErrorException(error);
@@ -88,19 +90,19 @@ export class UniversityService {
         order,
       });
 
-      return {
-        total: total,
-        page: paginationDto.pageNumber,
-        lastPage: Math.ceil(total / paginationDto.pageSize),
-        data: subjects,
-      };
+      return new PaginationDataResponseDto<SubjectDto>(
+        total,
+        paginationDto.pageNumber,
+        Math.ceil(total / paginationDto.pageSize),
+        subjects.map((i) => new SubjectDto(i)),
+      );
     } catch (error) {
       this.logger.log(error);
       throw new InternalServerErrorException(error);
     }
   }
 
-  async updateSubject(updateSubject: UpdateSubjectDto, id: UUID) {
+  async updateSubject(updateSubject: CreateSubjectDto, id: UUID) {
     try {
       const subject = await this.subjectRepository.findOneBy({ id });
 
@@ -150,7 +152,7 @@ export class UniversityService {
 
       subject.students.push(student);
 
-      return await this.subjectRepository.save(subject);
+      return new SubjectDto(await this.subjectRepository.save(subject));
     } catch (error) {
       this.logger.log(error);
       throw new InternalServerErrorException(error);
@@ -160,45 +162,44 @@ export class UniversityService {
   async deleteStudentFromSubject(subjectId: UUID, studentId: UUID) {
     try {
       const subject: Subject = await this.subjectRepository.findOne({
-        where: { id: subjectId },
+        where: { id: subjectId, students: { id: studentId } },
         relations: { students: true },
       });
 
       if (!subject) throw new NotFoundException('Subject not found');
 
-      if (!subject.students.some((s) => s.id === studentId)) {
-        throw new ConflictException('Student is not added to the subject');
-      }
-
-      const index = subject.students.findIndex(
-        (student) => student.id === studentId,
+      subject.students = subject.students.filter(
+        (student) => student.id !== studentId,
       );
 
-      subject.students.splice(index, 1);
-
-      return await this.subjectRepository.save(subject);
+      return new SubjectDto(await this.subjectRepository.save(subject));
     } catch (error) {
       this.logger.log(error);
       throw new InternalServerErrorException(error);
     }
   }
 
-  async addGrade(subjectId: UUID, studentId: UUID, grade: GradeDto) {
+  async addGrade(subjectId: UUID, studentId: UUID, grade: CreateGradeDto) {
     try {
       const subject: Subject = await this.subjectRepository.findOne({
-        where: { id: subjectId },
+        where: { id: subjectId, students: { id: studentId } },
         relations: { students: true },
       });
       const student: User = await this.userService.getUserById(studentId);
 
-      if (!subject.students.some((s) => s.id === student.id)) {
+      if (!subject) {
         throw new ConflictException('Student is not found to the subject');
       }
 
-      grade.subject = subject;
-      grade.student = student;
+      const gradeDto = new GradeDto(
+        new UserDto(student),
+        new SubjectDto(subject),
+        grade.grade,
+      );
 
-      return await this.gradeRepository.save(grade);
+      await this.gradeRepository.save(gradeDto);
+
+      return gradeDto;
     } catch (error) {
       this.logger.log(error);
       throw new InternalServerErrorException(error);
@@ -228,12 +229,12 @@ export class UniversityService {
         order,
       });
 
-      return {
-        total: total,
-        page: paginationDto.pageNumber,
-        lastPage: Math.ceil(total / paginationDto.pageSize),
-        data: grades,
-      };
+      return new PaginationDataResponseDto<GradeDto>(
+        total,
+        paginationDto.pageNumber,
+        Math.ceil(total / paginationDto.pageSize),
+        grades.map((i) => new GradeDto(i.student, i.subject, i.grade)),
+      );
     } catch (error) {
       this.logger.log(error);
       throw new InternalServerErrorException(error);
@@ -243,22 +244,22 @@ export class UniversityService {
   async updateGrade(
     subjectId: UUID,
     studentId: UUID,
-    gradeDto: UpdateGradeDto,
+    gradeDto: CreateGradeDto,
   ) {
     try {
       const subject: Subject = await this.subjectRepository.findOne({
-        where: { id: subjectId },
+        where: { id: subjectId, students: { id: studentId } },
         relations: { students: true },
       });
       const student: User = await this.userService.getUserById(studentId);
 
-      const grade: Grade = await this.gradeRepository.findOne({
-        where: { subject: subject, student: student },
-      });
-
-      if (!subject.students.some((s) => s.id === student.id)) {
+      if (!subject) {
         throw new ConflictException('Student is not found to the subject');
       }
+
+      const grade: Grade = await this.gradeRepository.findOne({
+        where: { subject, student },
+      });
 
       if (!grade) throw new NotFoundException('Grade not found');
 
@@ -289,58 +290,17 @@ export class UniversityService {
     }
   }
 
-  async randomGenerateSubjects(round: number) {
-    const subjectsName = [
-      'Introduction to Computer Science',
-      'Advanced Mathematics',
-      'Principles of Economics',
-      'English Literature',
-      'Psychology 101',
-      'History of Modern Art',
-      'Organic Chemistry',
-      'Physical Education',
-      'Environmental Science',
-      'Data Structures and Algorithms',
-      'Business Management',
-      'Sociology and Society',
-      'World Geography',
-      'Political Science',
-      'Calculus for Engineers',
-      'Microeconomics',
-      'Programming in Python',
-      'Molecular Biology',
-      'Introduction to Philosophy',
-      'Digital Marketing',
-      'International Relations',
-      'Artificial Intelligence',
-      'Renewable Energy Technologies',
-      'Civil Engineering Fundamentals',
-      'Graphic Design Basics',
-      'Music Theory',
-      'Ethics in Technology',
-      'Introduction to Finance',
-      'Global Health and Wellness',
-      'Urban Studies',
-    ];
+  async randomGenerateSubjects(round: number, id: UUID) {
+    const subjects: Subject[] = await this.subjectRepository
+      .createQueryBuilder('subject')
+      .orderBy('RANDOM()')
+      .limit(round)
+      .getMany();
 
-    const teachers: User[] = (
-      await this.userService.getAllUsers(new PaginationDto())
-    ).data.filter((user) => user.role === UserRole.Teacher);
+    const student: UserDto = await this.userService.getUserById(id);
 
-    const shuffledSubjects = subjectsName.sort(() => Math.random() - 0.5);
+    student.subjects.push(...subjects);
 
-    for (let index = 0; index < round; index++) {
-      const randomTeacher =
-        teachers[Math.floor(Math.random() * teachers.length)];
-
-      const subjectDto: SubjectDto = {
-        name: shuffledSubjects[index],
-        teacher: randomTeacher,
-        id: randomUUID(),
-        students: [],
-      };
-
-      await this.createSubject(subjectDto);
-    }
+    return await this.userService.updateUser(student);
   }
 }
