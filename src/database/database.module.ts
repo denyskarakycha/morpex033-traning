@@ -10,6 +10,7 @@ dotenvConfig({ path: '.env' });
   imports: [
     TypeOrmModule.forRoot({
       ...databaseProviders,
+      autoLoadEntities: true,
     }),
   ],
 })
