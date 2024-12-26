@@ -37,6 +37,17 @@ export class InitUniversityDatabase1734808272244 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "user_subjects_subject" ADD CONSTRAINT "FK_5f6ad4fe37d091be3f9c4c2e04a" FOREIGN KEY ("subjectId") REFERENCES "subject"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
+    await queryRunner.query(`
+      INSERT INTO "user" (id, name, email, password, age, role)
+      VALUES (
+        'fb584143-5102-4cd5-a133-5d9dafa8660a',
+        'admin',
+        'admin@gmail.com',
+        'admin',
+        30,
+        'ADMIN'
+      );
+    `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

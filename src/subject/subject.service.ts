@@ -12,7 +12,6 @@ import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { SubjectDto } from './dto/subject.dto';
 import { UserRole } from 'src/user/enum/user-role.enum';
-import { randomUUID, UUID } from 'crypto';
 import { User } from 'src/database/entity/user.entity';
 import { StudentDto } from './dto/student.dto';
 import { GradeDto } from './dto/grade.dto';
@@ -21,6 +20,7 @@ import { CreateGradeDto } from './dto/create-grade.dto';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { PaginationDataResponseDto } from 'src/common/dto/pagination-data-response.dto';
 import { UserDto } from 'src/user/dto/user.dto';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class SubjectService {

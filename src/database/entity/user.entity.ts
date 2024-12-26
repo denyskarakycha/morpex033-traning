@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Subject } from './subject.entity';
+import { Book } from './book.entity';
 
 @Entity('user')
 export class User {
@@ -48,4 +49,7 @@ export class User {
   @ManyToMany(() => Subject, (subject) => subject.students)
   @JoinTable()
   public subjects: Subject[];
+
+  @OneToMany(() => Book, (book) => book.takenBy)
+  public books: Book[];
 }
