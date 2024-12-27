@@ -6,7 +6,7 @@ export class BookDto {
 
   public title: string;
 
-  public authors: Record<string, any>;
+  public authors: Record<string, any>[];
 
   public languages: string[];
 

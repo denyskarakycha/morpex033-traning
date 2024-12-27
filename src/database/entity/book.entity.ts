@@ -17,7 +17,7 @@ export class Book {
   public title: string;
 
   @Column({ type: 'jsonb', name: 'author' })
-  public authors: Record<string, any>;
+  public authors: Record<string, any>[];
 
   @Column({ type: 'varchar', name: 'languages' })
   public languages: string[];

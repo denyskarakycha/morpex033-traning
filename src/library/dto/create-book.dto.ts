@@ -5,7 +5,7 @@ export class CreateBookDto {
   public title: string;
 
   @IsObject()
-  public authors: Record<string, any>;
+  public authors: Record<string, any>[];
 
   @IsString()
   public languages: string[];
