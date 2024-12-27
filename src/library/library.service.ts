@@ -15,6 +15,9 @@ import { PaginationDataResponseDto } from '../common/dto/pagination-data-respons
 import { UUID } from 'crypto';
 import { UserDto } from '../user/dto/user.dto';
 import { UserService } from '../user/user.service';
+import { config as dotenvConfig } from 'dotenv';
+
+dotenvConfig({ path: '.env' });
 
 @Injectable()
 export class LibraryService {
@@ -28,7 +31,7 @@ export class LibraryService {
 
   @Cron('0 * * * *')
   async fetchBooks() {
-    const baseUrl = 'https://gutendex.com/books';
+    const baseUrl = process.env.BOOK_API_URL;
     let url = baseUrl;
 
     while (url) {
