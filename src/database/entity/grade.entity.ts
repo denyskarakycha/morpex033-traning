@@ -2,11 +2,12 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user.entity';
 import { Subject } from './subject.entity';
 import { Max, Min } from 'class-validator';
+import { UUID } from 'crypto';
 
 @Entity('grade')
 export class Grade {
   @PrimaryGeneratedColumn('uuid')
-  public id: string;
+  public id: UUID;
 
   @ManyToOne(() => User, (user) => user.id)
   public student: User;

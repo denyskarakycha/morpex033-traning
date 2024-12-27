@@ -2,6 +2,7 @@ import { UUID } from 'crypto';
 import { SubjectDto } from 'src/subject/dto/subject.dto';
 import { UserRole } from '../enum/user-role.enum';
 import { User } from 'src/database/entity/user.entity';
+import { BookDto } from '../../library/dto/book.dto';
 
 export class UserDto {
   public id: UUID;
@@ -20,6 +21,8 @@ export class UserDto {
 
   public subjects: SubjectDto[];
 
+  public books: BookDto[];
+
   constructor(user: User) {
     this.id = user.id;
     this.name = user.name;
@@ -29,5 +32,6 @@ export class UserDto {
     this.role = user.role;
     this.taughtSubjects = user.taughtSubjects;
     this.subjects = user.subjects;
+    this.books = user.books;
   }
 }
