@@ -35,6 +35,8 @@ export class SubjectService {
   ) {}
 
   async createSubject(subjectDto: CreateSubjectDto) {
+    console.log(subjectDto);
+
     try {
       const subject = await this.subjectRepository.findOneBy({
         name: subjectDto.name,
@@ -206,7 +208,7 @@ export class SubjectService {
     }
   }
 
-  async getAllGrades(subjectId: UUID, paginationDto: PaginationDto) {
+  async getAllGrades(subjectId: UUID, paginationDto?: PaginationDto) {
     try {
       const subject = await this.subjectRepository.findOneBy({ id: subjectId });
 

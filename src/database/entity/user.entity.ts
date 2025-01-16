@@ -1,4 +1,3 @@
-import { UUID } from 'crypto';
 import { UserRole } from '../../user/enum/user-role.enum';
 import {
   Column,
@@ -14,7 +13,7 @@ import { Book } from './book.entity';
 @Entity('user')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: UUID;
+  id: string;
 
   @Column({
     name: 'name',
