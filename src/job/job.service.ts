@@ -119,6 +119,4 @@ export class JobService {
       throw new InternalServerErrorException(error);
     }
   }
-
-  async findFilteredJob() {}
 }
