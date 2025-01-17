@@ -1,9 +1,10 @@
-import { UUID } from 'crypto';
+import { IsUUID } from 'class-validator';
 import { Subject } from 'src/database/entity/subject.entity';
 import { UserDto } from 'src/user/dto/user.dto';
 
 export class SubjectDto {
-  public id: UUID;
+  @IsUUID()
+  public id: string;
 
   public name: string;
 

@@ -1,4 +1,3 @@
-import { UUID } from 'crypto';
 import {
   Column,
   Entity,
@@ -11,7 +10,7 @@ import { User } from './user.entity';
 @Entity('subject')
 export class Subject {
   @PrimaryGeneratedColumn('uuid')
-  public id: UUID;
+  public id: string;
 
   @Column({
     name: 'name',
@@ -20,9 +19,9 @@ export class Subject {
   })
   public name: string;
 
-  @ManyToOne(() => User, (user) => user.taughtSubjects)
+  @ManyToOne(() => User, (user) => user.taughtSubjects, { onDelete: 'CASCADE' })
   public teacher: User;
 
-  @ManyToMany(() => User, (user) => user.subjects)
+  @ManyToMany(() => User, (user) => user.subjects, { onDelete: 'CASCADE' })
   public students: User[];
 }

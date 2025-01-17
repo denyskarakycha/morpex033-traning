@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -13,14 +14,13 @@ import { Repository } from 'typeorm';
 import { SubjectDto } from './dto/subject.dto';
 import { UserRole } from 'src/user/enum/user-role.enum';
 import { User } from 'src/database/entity/user.entity';
-import { StudentDto } from './dto/student.dto';
 import { GradeDto } from './dto/grade.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateGradeDto } from './dto/create-grade.dto';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { PaginationDataResponseDto } from 'src/common/dto/pagination-data-response.dto';
 import { UserDto } from 'src/user/dto/user.dto';
-import { UUID } from 'crypto';
+import { ResponseUserDto } from '../user/dto/response-user.dto';
 
 @Injectable()
 export class SubjectService {
@@ -35,8 +35,6 @@ export class SubjectService {
   ) {}
 
   async createSubject(subjectDto: CreateSubjectDto) {
-    console.log(subjectDto);
-
     try {
       const subject = await this.subjectRepository.findOneBy({
         name: subjectDto.name,
@@ -60,7 +58,7 @@ export class SubjectService {
     }
   }
 
-  async getSubject(id: UUID) {
+  async getSubject(id: string) {
     try {
       const subject = await this.subjectRepository.findOne({
         where: { id: id },
@@ -104,7 +102,7 @@ export class SubjectService {
     }
   }
 
-  async updateSubject(updateSubject: CreateSubjectDto, id: UUID) {
+  async updateSubject(updateSubject: CreateSubjectDto, id: string) {
     try {
       const subject = await this.subjectRepository.findOneBy({ id });
 
@@ -119,7 +117,7 @@ export class SubjectService {
     }
   }
 
-  async deleteSubject(id: UUID) {
+  async deleteSubject(id: string) {
     try {
       const subject = await this.subjectRepository.findOneBy({ id });
 
@@ -134,16 +132,24 @@ export class SubjectService {
     }
   }
 
-  async addStudentToSubject(id: UUID, studentDto: StudentDto) {
+  async addStudentToSubject(id: string, studentId: string) {
     try {
+      console.log(studentId);
+
       const subject: Subject = await this.subjectRepository.findOne({
         where: { id },
         relations: { students: true },
       });
-      const student: User = await this.userService.getUserById(studentDto.id);
+
+      const student: User = await this.userService.getUserById(studentId);
+      console.log(student);
 
       if (!subject || !student) {
         throw new NotFoundException('Subject or Student not found');
+      }
+
+      if (student.role !== UserRole.Student) {
+        throw new BadRequestException('User must have Student role');
       }
 
       if (subject.students.some((s) => s.id === student.id)) {
@@ -161,7 +167,7 @@ export class SubjectService {
     }
   }
 
-  async deleteStudentFromSubject(subjectId: UUID, studentId: UUID) {
+  async deleteStudentFromSubject(subjectId: string, studentId: string) {
     try {
       const subject: Subject = await this.subjectRepository.findOne({
         where: { id: subjectId, students: { id: studentId } },
@@ -181,7 +187,7 @@ export class SubjectService {
     }
   }
 
-  async addGrade(subjectId: UUID, studentId: UUID, grade: CreateGradeDto) {
+  async addGrade(subjectId: string, studentId: string, grade: CreateGradeDto) {
     try {
       const subject: Subject = await this.subjectRepository.findOne({
         where: { id: subjectId, students: { id: studentId } },
@@ -194,7 +200,7 @@ export class SubjectService {
       }
 
       const gradeDto = new GradeDto(
-        new UserDto(student),
+        new ResponseUserDto(student),
         new SubjectDto(subject),
         grade.grade,
       );
@@ -208,7 +214,7 @@ export class SubjectService {
     }
   }
 
-  async getAllGrades(subjectId: UUID, paginationDto?: PaginationDto) {
+  async getAllGrades(subjectId: string, paginationDto?: PaginationDto) {
     try {
       const subject = await this.subjectRepository.findOneBy({ id: subjectId });
 
@@ -243,9 +249,30 @@ export class SubjectService {
     }
   }
 
+  async getGradesByStudentAndSubject(studentId: string, subjectId: string) {
+    try {
+      const user = await this.userService.getUserById(studentId);
+      const subject = await this.subjectRepository.findOne({
+        where: { id: subjectId },
+      });
+      const grades = await this.gradeRepository
+        .createQueryBuilder('grade')
+        .leftJoinAndSelect('grade.student', 'student')
+        .leftJoinAndSelect('grade.subject', 'subject')
+        .where('grade.student = :studentId', { studentId: `${user.id}` })
+        .andWhere('grade.subject = :subjectId', { subjectId: `${subject.id}` })
+        .getMany();
+
+      return grades;
+    } catch (error) {
+      this.logger.log(error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+
   async updateGrade(
-    subjectId: UUID,
-    studentId: UUID,
+    subjectId: string,
+    studentId: string,
     gradeDto: CreateGradeDto,
   ) {
     try {
@@ -272,7 +299,7 @@ export class SubjectService {
     }
   }
 
-  async deleteGrade(subjectId: UUID, gradeId: UUID) {
+  async deleteGrade(subjectId: string, gradeId: string) {
     try {
       const subject = await this.subjectRepository.findOneBy({ id: subjectId });
 
@@ -292,7 +319,7 @@ export class SubjectService {
     }
   }
 
-  async randomGenerateSubjects(round: number, id: UUID) {
+  async randomGenerateSubjects(round: number, id: string) {
     const subjects: Subject[] = await this.subjectRepository
       .createQueryBuilder('subject')
       .orderBy('RANDOM()')

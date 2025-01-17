@@ -1,18 +1,32 @@
 import { SubjectDto } from 'src/subject/dto/subject.dto';
 import { UserRole } from '../enum/user-role.enum';
-import { User } from 'src/database/entity/user.entity';
 import { BookDto } from '../../library/dto/book.dto';
 import { Optional } from '@nestjs/common';
-import { IsNumber, IsUUID } from 'class-validator';
+import {
+  IsEmail,
+  IsNumber,
+  IsString,
+  IsUUID,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class UserDto {
   @IsUUID()
   public id: string;
 
+  @IsString()
+  @MinLength(5)
+  @MaxLength(25)
   public name: string;
 
+  @IsString()
+  @IsEmail()
   public email: string;
 
+  @IsString()
+  @MinLength(5)
+  @MaxLength(26)
   public password: string;
 
   @IsNumber()
@@ -28,16 +42,4 @@ export class UserDto {
 
   @Optional()
   public books: BookDto[];
-
-  constructor(user: User) {
-    this.id = user.id;
-    this.name = user.name;
-    this.email = user.email;
-    this.password = user.password;
-    this.age = user.age;
-    this.role = user.role;
-    this.taughtSubjects = user.taughtSubjects;
-    this.subjects = user.subjects;
-    this.books = user.books;
-  }
 }

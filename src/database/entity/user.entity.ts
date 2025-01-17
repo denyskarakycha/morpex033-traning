@@ -45,7 +45,9 @@ export class User {
   @OneToMany(() => Subject, (subject) => subject.teacher)
   public taughtSubjects: Subject[];
 
-  @ManyToMany(() => Subject, (subject) => subject.students)
+  @ManyToMany(() => Subject, (subject) => subject.students, {
+    onDelete: 'CASCADE',
+  })
   @JoinTable()
   public subjects: Subject[];
 

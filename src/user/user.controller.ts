@@ -31,19 +31,19 @@ export class UserController {
   }
 
   @Get('/:id')
-  getUser(@Param('id') id: UUID) {
+  getUser(@Param('id') id: string) {
     return this.userService.getUserById(id);
   }
 
   @Roles([UserRole.Teacher, UserRole.Admin])
   @Delete('/:id')
-  deleteUser(@Param('id') id: UUID) {
+  deleteUser(@Param('id') id: string) {
     return this.userService.deleteUserById(id);
   }
 
   @Roles([UserRole.Admin])
   @Put('/:id')
-  updateUserById(@Param('id') id: UUID, @Body() updateUserDto: UpdateUserDto) {
+  updateUserById(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.updateUserById(id, updateUserDto);
   }
 }

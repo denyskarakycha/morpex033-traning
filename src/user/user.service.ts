@@ -8,12 +8,12 @@ import {
 import { SingUpUserDto } from './dto/sing-up-user.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { User } from 'src/database/entity/user.entity';
-import { UUID } from 'crypto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDataResponseDto } from 'src/common/dto/pagination-data-response.dto';
 import { UserDto } from './dto/user.dto';
+import { ResponseUserDto } from './dto/response-user.dto';
 
 @Injectable()
 export class UserService {
@@ -44,7 +44,7 @@ export class UserService {
         total,
         paginationDto.pageNumber,
         Math.ceil(total / paginationDto.pageSize),
-        users.map((i) => new UserDto(i)),
+        users.map((i) => new ResponseUserDto(i)),
       );
     } catch (error) {
       this.logger.log(error);
@@ -52,7 +52,7 @@ export class UserService {
     }
   }
 
-  async getUserById(id: UUID) {
+  async getUserById(id: string) {
     try {
       const user = await this.userRepository.findOne({
         where: { id },
@@ -61,7 +61,7 @@ export class UserService {
 
       if (!user) throw new NotFoundException('User not found');
 
-      return new UserDto(user);
+      return new ResponseUserDto(user);
     } catch (error) {
       this.logger.log(error);
       throw new InternalServerErrorException(error);
@@ -76,7 +76,7 @@ export class UserService {
 
       if (!user) throw new NotFoundException('User not found');
 
-      return new UserDto(user);
+      return new ResponseUserDto(user);
     } catch (error) {
       this.logger.log(error);
       throw new InternalServerErrorException(error);
@@ -94,14 +94,14 @@ export class UserService {
 
       const createdUser: User = await this.userRepository.save(createUserDto);
 
-      return new UserDto(createdUser);
+      return new ResponseUserDto(createdUser);
     } catch (error) {
       this.logger.log(error);
       throw new InternalServerErrorException(error);
     }
   }
 
-  async deleteUserById(id: UUID) {
+  async deleteUserById(id: string) {
     try {
       const user = await this.userRepository.findOneBy({ id });
 
@@ -116,7 +116,7 @@ export class UserService {
     }
   }
 
-  async updateUserById(id: UUID, updateUserDto: UpdateUserDto) {
+  async updateUserById(id: string, updateUserDto: UpdateUserDto) {
     try {
       const user = await this.userRepository.findOneBy({ id: id });
 

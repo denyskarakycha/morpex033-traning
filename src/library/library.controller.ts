@@ -27,17 +27,17 @@ export class LibraryController {
   }
 
   @Get('/:id')
-  getBook(@Param('id') id: UUID) {
+  getBook(@Param('id') id: string) {
     return this.libraryService.getBookById(id);
   }
 
   @Post('/:id')
-  issueBookToUser(@Param('id') id: UUID, @Auth() user: UserDto) {
+  issueBookToUser(@Param('id') id: string, @Auth() user: UserDto) {
     return this.libraryService.issueBook(id, user);
   }
 
   @Put('/:id')
-  returnBook(@Param('id') id: UUID, @Auth() user: UserDto) {
+  returnBook(@Param('id') id: string, @Auth() user: UserDto) {
     return this.libraryService.returnBook(id, user);
   }
 }

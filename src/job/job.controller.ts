@@ -1,6 +1,12 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { JobService } from './job.service';
-import { UUID } from 'crypto';
 import { AuthGuard } from '../auth/auth.guard';
 
 @UseGuards(AuthGuard)
@@ -8,8 +14,8 @@ import { AuthGuard } from '../auth/auth.guard';
 export class JobController {
   constructor(private readonly jobService: JobService) {}
 
-  @Post()
-  findJobForStudent(@Body('id') id: UUID) {
-    return this.jobService.findJobForStudent(id);
+  @Post('/for-student/:id')
+  findJobForStudent(@Param('id') id: string, @Query('search') search: string) {
+    return this.jobService.findJobForStudent(id, search);
   }
 }

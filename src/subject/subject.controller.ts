@@ -13,8 +13,6 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { UserRole } from 'src/user/enum/user-role.enum';
-import { UUID } from 'crypto';
-import { StudentDto } from './dto/student.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateGradeDto } from './dto/create-grade.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -29,20 +27,21 @@ export class SubjectController {
 
   @Post('/random/:round/student/:id')
   @Roles([UserRole.Admin])
-  randomSubjectGenerate(@Param('round') round: number, @Param('id') id: UUID) {
+  randomSubjectGenerate(
+    @Param('round') round: number,
+    @Param('id') id: string,
+  ) {
     return this.subjectService.randomGenerateSubjects(round, id);
   }
 
   @Post()
   @Roles([UserRole.Admin])
   createSubject(@Body() subject: CreateSubjectDto) {
-    console.log(subject);
-
     return this.subjectService.createSubject(subject);
   }
 
   @Get('/:id')
-  getSubject(@Param('id') id: UUID) {
+  getSubject(@Param('id') id: string) {
     return this.subjectService.getSubject(id);
   }
 
@@ -53,30 +52,30 @@ export class SubjectController {
 
   @Put('/:id')
   @Roles([UserRole.Admin])
-  updateSubject(@Param('id') id: UUID, @Body() subject: CreateSubjectDto) {
+  updateSubject(@Param('id') id: string, @Body() subject: CreateSubjectDto) {
     return this.subjectService.updateSubject(subject, id);
   }
 
   @Delete('/:id')
   @Roles([UserRole.Admin])
-  deleteSubject(@Param('id') id: UUID) {
+  deleteSubject(@Param('id') id: string) {
     return this.subjectService.deleteSubject(id);
   }
 
-  @Post('/:id')
+  @Post('/:id/add-student/:studentId')
   @Roles([UserRole.Admin])
   addStudentToSubject(
-    @Param('id') subjectId: UUID,
-    @Body() student: StudentDto,
+    @Param('id') subjectId: string,
+    @Param('studentId') studentId: string,
   ) {
-    return this.subjectService.addStudentToSubject(subjectId, student);
+    return this.subjectService.addStudentToSubject(subjectId, studentId);
   }
 
   @Delete('/:subjectId/student/:studentId')
   @Roles([UserRole.Admin])
   deleteStudentFromSubject(
-    @Param('subjectId') subjectId: UUID,
-    @Param('studentId') studentId: UUID,
+    @Param('subjectId') subjectId: string,
+    @Param('studentId') studentId: string,
   ) {
     return this.subjectService.deleteStudentFromSubject(subjectId, studentId);
   }
@@ -84,8 +83,8 @@ export class SubjectController {
   @Post('/:subjectId/student/:studentId')
   @Roles([UserRole.Teacher, UserRole.Admin])
   addGrade(
-    @Param('subjectId') subjectId: UUID,
-    @Param('studentId') studentId: UUID,
+    @Param('subjectId') subjectId: string,
+    @Param('studentId') studentId: string,
     @Body() grade: CreateGradeDto,
   ) {
     return this.subjectService.addGrade(subjectId, studentId, grade);
@@ -93,7 +92,7 @@ export class SubjectController {
 
   @Get('/:subjectId/grade')
   getAllGrades(
-    @Param('subjectId') subjectId: UUID,
+    @Param('subjectId') subjectId: string,
     @Query() pagination: PaginationDto,
   ) {
     return this.subjectService.getAllGrades(subjectId, pagination);
@@ -102,8 +101,8 @@ export class SubjectController {
   @Put('/:subjectId/student/:studentId/grade')
   @Roles([UserRole.Teacher, UserRole.Admin])
   updateGrade(
-    @Param('subjectId') subjectId: UUID,
-    @Param('studentId') studentId: UUID,
+    @Param('subjectId') subjectId: string,
+    @Param('studentId') studentId: string,
     @Body() grade: CreateGradeDto,
   ) {
     return this.subjectService.updateGrade(subjectId, studentId, grade);
@@ -112,8 +111,8 @@ export class SubjectController {
   @Delete('/:subjectId/grade/:gradeId')
   @Roles([UserRole.Teacher, UserRole.Admin])
   deleteGrade(
-    @Param('subjectId') subjectId: UUID,
-    @Param('gradeId') gradeId: UUID,
+    @Param('subjectId') subjectId: string,
+    @Param('gradeId') gradeId: string,
   ) {
     return this.subjectService.deleteGrade(subjectId, gradeId);
   }

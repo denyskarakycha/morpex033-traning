@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Book } from '../database/entity/book.entity';
 import { Repository } from 'typeorm';
 import { CreateBookDto } from './dto/create-book.dto';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { BookDto } from './dto/book.dto';
 import { PaginationDataResponseDto } from '../common/dto/pagination-data-response.dto';
@@ -29,7 +29,7 @@ export class LibraryService {
     private readonly userService: UserService,
   ) {}
 
-  @Cron('0 * * * *')
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
   async fetchBooks() {
     const baseUrl = process.env.BOOK_API_URL;
     let url = baseUrl;
@@ -99,7 +99,7 @@ export class LibraryService {
     }
   }
 
-  async getBookById(id: UUID) {
+  async getBookById(id: string) {
     try {
       const book = await this.bookRepository.findOneBy({ id });
 
@@ -110,7 +110,7 @@ export class LibraryService {
     }
   }
 
-  async issueBook(id: UUID, user: UserDto) {
+  async issueBook(id: string, user: UserDto) {
     try {
       const returnBy = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
       const book = await this.bookRepository.findOneBy({ id });
@@ -130,7 +130,7 @@ export class LibraryService {
     }
   }
 
-  async returnBook(id: UUID, user: UserDto) {
+  async returnBook(id: string, user: UserDto) {
     try {
       const book = await this.bookRepository.findOne({
         where: { id, takenBy: user },

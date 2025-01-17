@@ -2,17 +2,16 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user.entity';
 import { Subject } from './subject.entity';
 import { Max, Min } from 'class-validator';
-import { UUID } from 'crypto';
 
 @Entity('grade')
 export class Grade {
   @PrimaryGeneratedColumn('uuid')
-  public id: UUID;
+  public id: string;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
   public student: User;
 
-  @ManyToOne(() => Subject, (subject) => subject.id)
+  @ManyToOne(() => Subject, (subject) => subject.id, { onDelete: 'CASCADE' })
   public subject: Subject;
 
   @Column({ name: 'grade', type: 'int' })
