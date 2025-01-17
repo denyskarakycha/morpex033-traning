@@ -15,5 +15,6 @@ import { Grade } from 'src/database/entity/grade.entity';
   ],
   controllers: [SubjectController],
   providers: [SubjectService],
+  exports: [SubjectService],
 })
 export class SubjectModule {}

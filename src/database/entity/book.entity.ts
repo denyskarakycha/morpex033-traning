@@ -1,4 +1,3 @@
-import { UUID } from 'crypto';
 import {
   Column,
   Entity,
@@ -11,7 +10,7 @@ import { User } from './user.entity';
 @Entity('book')
 export class Book {
   @PrimaryGeneratedColumn('uuid')
-  public id: UUID;
+  public id: string;
 
   @Column({ type: 'varchar', name: 'title' })
   public title: string;

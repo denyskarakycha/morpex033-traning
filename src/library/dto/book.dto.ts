@@ -1,8 +1,7 @@
-import { UUID } from 'crypto';
 import { UserDto } from '../../user/dto/user.dto';
 
 export class BookDto {
-  public id: UUID;
+  public id: string;
 
   public title: string;
 

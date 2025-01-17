@@ -1,4 +1,3 @@
-import { UUID } from 'crypto';
 import { UserRole } from '../../user/enum/user-role.enum';
 import {
   Column,
@@ -14,7 +13,7 @@ import { Book } from './book.entity';
 @Entity('user')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: UUID;
+  id: string;
 
   @Column({
     name: 'name',
@@ -46,7 +45,9 @@ export class User {
   @OneToMany(() => Subject, (subject) => subject.teacher)
   public taughtSubjects: Subject[];
 
-  @ManyToMany(() => Subject, (subject) => subject.students)
+  @ManyToMany(() => Subject, (subject) => subject.students, {
+    onDelete: 'CASCADE',
+  })
   @JoinTable()
   public subjects: Subject[];
 
