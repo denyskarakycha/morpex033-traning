@@ -16,7 +16,6 @@ import { UserService } from '../user/user.service';
 import { SubjectService } from '../subject/subject.service';
 import { UserDto } from '../user/dto/user.dto';
 import { JobDto } from './dto/job.dto';
-import { query } from 'express';
 
 dotenvConfig({ path: '.env' });
 
@@ -41,7 +40,7 @@ export class JobService {
       const response = await fetch(fetchUrl);
 
       if (!response.ok) {
-        throw new Error(`Ошибка HTTP: ${response.status}`);
+        throw new Error(`Error HTTP: ${response.status}`);
       }
 
       const parser = new XMLParser();

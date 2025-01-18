@@ -7,19 +7,19 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Grade } from 'src/database/entity/grade.entity';
-import { Subject } from 'src/database/entity/subject.entity';
-import { UserService } from 'src/user/user.service';
+import { Grade } from '../database/entity/grade.entity';
+import { Subject } from '../database/entity/subject.entity';
+import { UserService } from '../user/user.service';
 import { Repository } from 'typeorm';
 import { SubjectDto } from './dto/subject.dto';
-import { UserRole } from 'src/user/enum/user-role.enum';
-import { User } from 'src/database/entity/user.entity';
+import { UserRole } from '../user/enum/user-role.enum';
+import { User } from '../database/entity/user.entity';
 import { GradeDto } from './dto/grade.dto';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { CreateGradeDto } from './dto/create-grade.dto';
 import { CreateSubjectDto } from './dto/create-subject.dto';
-import { PaginationDataResponseDto } from 'src/common/dto/pagination-data-response.dto';
-import { UserDto } from 'src/user/dto/user.dto';
+import { PaginationDataResponseDto } from '../common/dto/pagination-data-response.dto';
+import { UserDto } from '../user/dto/user.dto';
 import { ResponseUserDto } from '../user/dto/response-user.dto';
 
 @Injectable()

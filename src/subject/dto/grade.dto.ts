@@ -1,15 +1,19 @@
 import { Type } from 'class-transformer';
 import { IsNumber, Max, Min } from 'class-validator';
-import { UserDto } from 'src/user/dto/user.dto';
+import { UserDto } from '../../user/dto/user.dto';
 import { SubjectDto } from './subject.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class GradeDto {
+  @ApiProperty({ type: UserDto })
   @Type(() => UserDto)
   public student: UserDto;
 
+  @ApiProperty({ type: SubjectDto })
   @Type(() => SubjectDto)
   public subject: SubjectDto;
 
+  @ApiProperty()
   @IsNumber()
   @Min(0)
   @Max(100)

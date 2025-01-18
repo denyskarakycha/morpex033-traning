@@ -1,14 +1,19 @@
-
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateJobDto {
+  @ApiProperty()
   public title: string;
 
+  @ApiProperty()
   public description: string;
 
+  @ApiProperty({ isArray: true })
   public category: string[];
 
+  @ApiProperty({ type: Date })
   public pubDate: Date;
 
+  @ApiProperty()
   public link: string;
 
   constructor(data: any, description: string) {

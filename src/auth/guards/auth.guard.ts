@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { config as dotenvConfig } from 'dotenv';
-import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { UserService } from '../../user/user.service';
 dotenvConfig({ path: '.env' });
 
 @Injectable()

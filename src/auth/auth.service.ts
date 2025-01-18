@@ -4,12 +4,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { SingUpUserDto } from 'src/user/dto/sing-up-user.dto';
-import { User } from 'src/database/entity/user.entity';
-import { SingInUserDto } from 'src/user/dto/sing-in-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from 'src/user/user.service';
 import { config as dotenvConfig } from 'dotenv';
+import { AccessRefreshTokenDto } from './dto/access-refresh-token.dto';
+import { AccessTokenDto } from './dto/access_token.dto';
+import { SingInUserDto } from '../user/dto/sing-in-user.dto';
+import { SingUpUserDto } from '../user/dto/sing-up-user.dto';
+import { UserService } from '../user/user.service';
 dotenvConfig({ path: '.env' });
 
 @Injectable()
@@ -19,7 +20,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async singUp(singUpUserDto: SingUpUserDto): Promise<User> {
+  async singUp(singUpUserDto: SingUpUserDto) {
     try {
       const hash = await bcrypt.hash(singUpUserDto.password, 8);
 
@@ -47,10 +48,7 @@ export class AuthService {
           expiresIn: process.env.REFRESH_EXPIRES_IN,
         });
 
-        return {
-          accessToken,
-          refreshToken,
-        };
+        return new AccessRefreshTokenDto(accessToken, refreshToken);
       } else {
         throw new UnauthorizedException('Wrong email or password');
       }
@@ -75,6 +73,6 @@ export class AuthService {
       },
     );
 
-    return { accessToken };
+    return new AccessTokenDto(accessToken);
   }
 }

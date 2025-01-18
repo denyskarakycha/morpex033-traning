@@ -1,19 +1,26 @@
-import { UUID } from 'crypto';
+import { ApiProperty } from '@nestjs/swagger';
 import { Job } from '../../database/entity/job.entity';
 
 export class JobDto {
+  @ApiProperty()
   public id: string;
 
+  @ApiProperty()
   public title: string;
 
+  @ApiProperty({ isArray: true })
   public responsibilities: string[];
 
+  @ApiProperty()
   public description: string;
 
+  @ApiProperty({ isArray: true })
   public category: string[];
 
+  @ApiProperty({ type: Date })
   public pubDate: Date;
 
+  @ApiProperty()
   public link: string;
 
   constructor(job: Job) {

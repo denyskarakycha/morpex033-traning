@@ -4,27 +4,37 @@ import { IsUUID } from 'class-validator';
 import { UserRole } from '../enum/user-role.enum';
 import { SubjectDto } from '../../subject/dto/subject.dto';
 import { BookDto } from '../../library/dto/book.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class ResponseUserDto {
+  @ApiProperty()
   @IsUUID()
   public id: string;
 
+  @ApiProperty()
   public name: string;
 
+  @ApiProperty()
   public email: string;
 
+  @ApiProperty()
   public password: string;
 
+  @ApiProperty()
   public age: number;
 
+  @ApiProperty({ enum: UserRole })
   public role: UserRole;
 
+  @ApiProperty({ isArray: true, type: SubjectDto, required: false })
   @Optional()
   public taughtSubjects: SubjectDto[];
 
+  @ApiProperty({ isArray: true, type: SubjectDto, required: false })
   @Optional()
   public subjects: SubjectDto[];
 
+  @ApiProperty({ isArray: true, type: BookDto, required: false })
   @Optional()
   public books: BookDto[];
 

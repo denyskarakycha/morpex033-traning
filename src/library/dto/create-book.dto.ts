@@ -1,12 +1,16 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsObject, IsString } from 'class-validator';
 
 export class CreateBookDto {
+  @ApiProperty()
   @IsString()
   public title: string;
 
+  @ApiProperty({ isArray: true })
   @IsObject()
   public authors: Record<string, any>[];
 
+  @ApiProperty({ isArray: true })
   @IsString()
   public languages: string[];
 

@@ -12,7 +12,6 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { BookDto } from './dto/book.dto';
 import { PaginationDataResponseDto } from '../common/dto/pagination-data-response.dto';
-import { UUID } from 'crypto';
 import { UserDto } from '../user/dto/user.dto';
 import { UserService } from '../user/user.service';
 import { config as dotenvConfig } from 'dotenv';
@@ -38,7 +37,7 @@ export class LibraryService {
       const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error(`Ошибка HTTP: ${response.status}`);
+        throw new Error(`Error HTTP: ${response.status}`);
       }
 
       const data = await response.json();

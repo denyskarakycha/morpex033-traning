@@ -7,11 +7,11 @@ import {
 } from '@nestjs/common';
 import { SingUpUserDto } from './dto/sing-up-user.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
-import { User } from 'src/database/entity/user.entity';
+import { User } from '../database/entity/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PaginationDataResponseDto } from 'src/common/dto/pagination-data-response.dto';
+import { PaginationDataResponseDto } from '../common/dto/pagination-data-response.dto';
 import { UserDto } from './dto/user.dto';
 import { ResponseUserDto } from './dto/response-user.dto';
 
@@ -122,7 +122,7 @@ export class UserService {
 
       if (!user) throw new NotFoundException('User not found');
 
-      return await this.userRepository.save(updateUserDto);
+      return new ResponseUserDto(await this.userRepository.save(updateUserDto));
     } catch (error) {
       this.logger.log(error);
       throw new InternalServerErrorException(error);
@@ -133,7 +133,7 @@ export class UserService {
     try {
       if (!user) throw new NotFoundException('User not found');
 
-      return await this.userRepository.save(user);
+      return new ResponseUserDto(await this.userRepository.save(user));
     } catch (error) {
       this.logger.log(error);
       throw new InternalServerErrorException(error);
